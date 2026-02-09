@@ -73,7 +73,7 @@ int main(){
     //now to the window itself 
     GLuint windowWidth=800;
     GLuint windowHeight=600;
-    GLFWwindow *window = glfwCreateWindow(windowWidth,windowHeight,"test",NULL,NULL);
+    GLFWwindow *window = glfwCreateWindow(windowWidth,windowHeight,"viewer3D",NULL,NULL);
     if(window==NULL){
         std::cout<<"failed to open the window"<<std::endl;
         glfwTerminate();
