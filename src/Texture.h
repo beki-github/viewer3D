@@ -14,6 +14,7 @@ public:
 	GLuint ID;
 	GLenum type;
 	GLenum textureSlot;
+	int widthImg, heightImg, numColCh;
 	Texture(const char* imagePath, GLenum texType, GLenum slot, GLenum pixelType);
 
 	// Assigns a texture unit to a texture

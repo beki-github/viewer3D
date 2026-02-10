@@ -33,7 +33,7 @@ Texture::Texture(const char* imagePath, GLenum texType, GLenum slot, GLenum pixe
 		glGenerateMipmap(texType);
 	}
 	else {
-		std::cout << "ERROR";
+		std::cout << "ERROR FAILLED to assign image to texture object";
 	}
 
 	// Deletes the image data as it is already in the OpenGL Texture object

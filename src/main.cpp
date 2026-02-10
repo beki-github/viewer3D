@@ -110,7 +110,7 @@ int main(){
 
     const char* imgPath = "assets/bricks.jpg";
     Texture popCat(imgPath, GL_TEXTURE_2D, GL_TEXTURE0, GL_UNSIGNED_BYTE);
-	  popCat.texUnit(shaderProgram3, "tex0", 0);
+	popCat.texUnit(shaderProgram3, "tex0", 0);
     popCat.Bind();
 
 

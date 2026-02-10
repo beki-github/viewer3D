@@ -40,6 +40,8 @@ add_executable(
     src/Camera.h
     src/Camera.cpp
     src/Debugger.h
+    src/Image.h
+    src/Image.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/dependencies)
