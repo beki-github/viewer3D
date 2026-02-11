@@ -6,7 +6,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 class Image: public Texture{
-    glm::vec3 position = glm::vec3(0.0f,0.0f,0.0f);
+    glm::vec3 Position = glm::vec3(0.0f,0.0f,0.0f);
     glm::mat4 model = glm::mat4(1.0f);
 
     /*
@@ -27,7 +27,7 @@ class Image: public Texture{
     it just updates the position vector for now 
 
     */
-    void Moveto(glm::vec3 newPosition);
+    void Moveto(Shader &shader,glm::vec3 newPosition);
 
 
 };
