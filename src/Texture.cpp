@@ -9,7 +9,7 @@ Texture::Texture(const char* imagePath, GLenum texType, GLenum slot, GLenum pixe
 	stbi_set_flip_vertically_on_load(true);
 	// Reads the image from a file and stores it in bytes
 	// Stores the width, height, and the number of color channels of the image
-	unsigned char* bytes = stbi_load(imagePath, &widthImg, &heightImg, &numColCh, 0);
+    unsigned char* bytes = stbi_load(imagePath, &widthImg, &heightImg, &numColCh, 0);
 	// Generates an OpenGL texture object
 	glGenTextures(1, &ID);
 	// Assigns the texture to a Texture Unit

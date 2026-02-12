@@ -5,6 +5,17 @@
 #include<iostream>
 
 
+struct image{
+    unsigned char *bytes;
+    int width,height,numCloch;
+    bool success;
+    image(unsigned char *imgbytes, int imgWidth, int imgheight, bool loadstatus)
+    :bytes(imgbytes),width(imgWidth),height(imgheight),success(loadstatus)
+    {
+
+    };
+};
+
 /*this header file is for
 texture class that is used to bind multiple 2D textures at once
 */
@@ -15,7 +26,7 @@ public:
 	GLenum type;
 	GLenum textureSlot;
 	int widthImg, heightImg, numColCh;
-	Texture(const char* imagePath, GLenum texType, GLenum slot, GLenum pixelType);
+	Texture(struct image, GLenum texType, GLenum slot, GLenum pixelType);
 
 	// Assigns a texture unit to a texture
 	void texUnit(Shader& shader, const char* uniform, GLuint unit);

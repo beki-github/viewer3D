@@ -1,5 +1,6 @@
 #include <iostream>
 #include <filesystem>
+#include<vector>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -50,6 +51,8 @@ float yaw = -90.0f;
 float pitch = 0.0f;
 //
 Camera camera = Camera(cameraPos,cameraUp);
+// struct for image 
+std::vector<image>;
 
 int main(){
     //intalize glfw 
