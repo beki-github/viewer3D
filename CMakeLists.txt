@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.16)
-project(test VERSION 1.0.0)
 cmake_policy(SET CMP0072 NEW)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/executable)
-
 project(viewer3D VERSION 1.0)
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/executable/Release)
+
+
 
 
 
@@ -78,7 +78,7 @@ if(WIN32)
    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
         "${CMAKE_SOURCE_DIR}/dependencies/GLFW/lib-vc2022/glfw3.dll"
-        "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/glfw3.dll"
+        "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/glfw3.dll"
         COMMENT "Copying GLFW DLL to executable directory..."
     )
 endif()

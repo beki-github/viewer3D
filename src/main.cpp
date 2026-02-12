@@ -13,6 +13,7 @@
 #include "shaderClass.h"
 #include "Camera.h"
 #include "Debugger.h"
+#include "Image.h"
 
 
 void processInput(GLFWwindow* window, float currentTime);
@@ -23,25 +24,18 @@ float lastFrame=0.0f;
 float deltaTime;
 
 // Vertices coordinates
-GLfloat vertices[] =
-{ //     COORDINATES     /        COLORS      /   TexCoord  //
-	-0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f,
-	-0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	5.0f, 0.0f,
-	 0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f,
-	 0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	5.0f, 0.0f,
-	 0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	2.5f, 5.0f
+float vertices[] = {
+    // positions          // colors           // texture coords
+     0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
+     0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
+    -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
+    -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
 };
-
 // Indices for vertices order
-GLuint indices[] =
-{
-	0, 1, 2,
-	0, 2, 3,
-	0, 1, 4,
-	1, 2, 4,
-	2, 3, 4,
-	3, 0, 4
-};
+unsigned int indices[] = {  // note that we start from 0!
+    0, 1, 3,   // first triangle
+    1, 2, 3    // second triangle
+}; 
 
 //global intial states for the camera
 glm::vec3 cameraPos= glm::vec3(0.0f,0.25f,6.0f);
@@ -99,8 +93,6 @@ int main(){
     VAO1.linkAttrib(VBO1,1,3,GL_FLOAT,8*sizeof(float),(void*)(sizeof(float)*3));
     VAO1.linkAttrib(VBO1,2,2,GL_FLOAT,8*sizeof(float),(void*)(sizeof(float)*6));
     
-
-
     VAO1.Unbind();
     VBO1.Unbind();
     
@@ -109,27 +101,24 @@ int main(){
     Shader shaderProgram3("shaders/shader.vert","shaders/shader.frag");
 
     const char* imgPath = "assets/bricks.jpg";
-    Texture popCat(imgPath, GL_TEXTURE_2D, GL_TEXTURE0, GL_UNSIGNED_BYTE);
-	popCat.texUnit(shaderProgram3, "tex0", 0);
-    popCat.Bind();
+    // Texture popCat(imgPath, GL_TEXTURE_2D, GL_TEXTURE0, GL_UNSIGNED_BYTE);
+	// popCat.texUnit(shaderProgram3, "tex0", 0);
+    // popCat.Bind();
 
+    Image brickWall(imgPath,GL_TEXTURE_2D,GL_TEXTURE0,GL_UNSIGNED_BYTE,glm::vec3(0.0f,0.0f,0.0f));
 
     glm::mat4 model=glm::mat4(1.0f);
     glm::mat4 view = glm::mat4(1.0f);
     glm::mat4 projection;
 
     model=glm::translate(model,glm::vec3(0.0f,0.0f,0.0f));
-   
+    model=glm::scale(model,glm::vec3(7.0f,7.0f,7.0f));
     projection = glm::perspective(glm::radians(45.0f),(float)windowWidth/(float)windowHeight,0.1f,100.0f);
 
-    shaderProgram3.use();
-    
-    
 
-    //trying to implement a camera!!
-   
-    
+    shaderProgram3.use();
     shaderProgram3.setMat4(2,GL_FALSE,projection);
+    shaderProgram3.setMat4(0,GL_FALSE,model);
 
     
     glEnable(GL_DEPTH_TEST);
@@ -138,34 +127,30 @@ int main(){
     glfwSetCursorPosCallback(window, mouse_callback);
 
     
-    
-    
     while(!glfwWindowShouldClose(window)){
 
         glClearColor(0.039f, 0.059f, 0.122f,0.3f);
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
         processInput(window,glfwGetTime());
         VAO1.Bind();
-        model=glm::rotate(model,glm::radians(0.004f),glm::vec3(0.0f,1.0f,0.0f));
-        shaderProgram3.setMat4(0,GL_FALSE,model);
+       
+        brickWall.Draw(shaderProgram3,indices);
         view=camera.GetViewMatrix();
         shaderProgram3.setMat4(1,GL_FALSE,view);
         glDrawElements(GL_TRIANGLES,sizeof(indices)/sizeof(int),GL_UNSIGNED_INT,0);
-        
-        //
+
         glfwSwapBuffers(window);
 
         glfwPollEvents();
 
     }
 
-
     
     
     VAO1.Delete();
     VBO1.Delete();
     EBO1.Delete();
-    popCat.Delete();
+    brickWall.Delete();
 
     //terminate glfw 
     glfwTerminate();

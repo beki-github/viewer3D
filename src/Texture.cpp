@@ -26,7 +26,7 @@ Texture::Texture(const char* imagePath, GLenum texType, GLenum slot, GLenum pixe
 	// Assigns the image to the OpenGL Texture object
 	if (bytes) {
 		GLenum format = (numColCh == 4) ? GL_RGBA : GL_RGB;
-		glTexImage2D(texType, 0, GL_RGBA, widthImg, heightImg, 0, format, pixelType, bytes);
+		glTexImage2D(texType, 0, GL_SRGB, widthImg, heightImg, 0, format, pixelType, bytes);
 		// Generates MipMaps
 		glGenerateMipmap(texType);
 	}
@@ -48,9 +48,11 @@ void Texture::texUnit(Shader& shader, const char* uniform, GLuint unit)
 }
 
 void Texture::Bind()
-{
-	glBindTexture(type, ID);
+{     
+	  
 	glActiveTexture(textureSlot);
+	glBindTexture(type, ID);
+	
 
 }
 
