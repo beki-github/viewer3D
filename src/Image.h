@@ -12,7 +12,7 @@ class Image: public Texture{
     /*
     a constructor to that intialize the parent class and set a postion vec3
     */
-    Image(const char* imagePath, GLenum texType, GLenum slot, GLenum pixelType,glm::vec3 position);
+    Image(imageStruct image, GLenum texType, GLenum slot, GLenum pixelType,glm::vec3 position);
     /*
     draw is a function that's suppose to draw which means set the model uniform 
     in the current active shader and bind the current texture then call glDrawelements

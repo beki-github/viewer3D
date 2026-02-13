@@ -1,15 +1,14 @@
 #include"Texture.h"
 
-Texture::Texture(const char* imagePath, GLenum texType, GLenum slot, GLenum pixelType)
-{
+Texture::Texture(imageStruct &image, GLenum texType, GLenum slot, GLenum pixelType)
+:imagePhoto(image)
+{ 
 	// Assigns the type of the texture ot the texture object
+
+    
 	type = texType;
 	textureSlot = slot;
-	// Flips the image so it appears right side up
-	stbi_set_flip_vertically_on_load(true);
-	// Reads the image from a file and stores it in bytes
-	// Stores the width, height, and the number of color channels of the image
-    unsigned char* bytes = stbi_load(imagePath, &widthImg, &heightImg, &numColCh, 0);
+
 	// Generates an OpenGL texture object
 	glGenTextures(1, &ID);
 	// Assigns the texture to a Texture Unit
@@ -24,18 +23,19 @@ Texture::Texture(const char* imagePath, GLenum texType, GLenum slot, GLenum pixe
 	glTexParameteri(texType, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	// Assigns the image to the OpenGL Texture object
-	if (bytes) {
-		GLenum format = (numColCh == 4) ? GL_RGBA : GL_RGB;
-		glTexImage2D(texType, 0, GL_SRGB, widthImg, heightImg, 0, format, pixelType, bytes);
+	if (imagePhoto.success) {
+		GLenum format = (imagePhoto.numCloch == 4) ? GL_RGBA : GL_RGB;
+		glTexImage2D(texType, 0, GL_SRGB, imagePhoto.width,imagePhoto.height, 0, format, pixelType, imagePhoto.bytes);
 		// Generates MipMaps
 		glGenerateMipmap(texType);
+
 	}
 	else {
 		std::cout << "ERROR FAILLED to assign image to texture object";
 	}
 
 	// Deletes the image data as it is already in the OpenGL Texture object
-	stbi_image_free(bytes);
+	stbi_image_free(imagePhoto.bytes);
 
 	// Unbinds the OpenGL Texture object so that it can't accidentally be modified
 	glBindTexture(texType, 0);

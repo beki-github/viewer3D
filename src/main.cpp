@@ -1,6 +1,6 @@
 #include <iostream>
 #include <filesystem>
-#include<vector>
+#include <vector>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -52,7 +52,9 @@ float pitch = 0.0f;
 //
 Camera camera = Camera(cameraPos,cameraUp);
 // struct for image 
-std::vector<image>;
+
+
+std::vector<imageStruct> imageVector;
 
 int main(){
     //intalize glfw 
@@ -79,11 +81,8 @@ int main(){
     //this line below is self explanitory 
     //context means an object that hold the whole of opengl
     glfwMakeContextCurrent(window);
-
     gladLoadGL();
     EnableModernDebugging();
-
-
     glViewport(0,0,windowWidth,windowHeight);
      
     VAO VAO1;
@@ -99,17 +98,34 @@ int main(){
     VAO1.Unbind();
     VBO1.Unbind();
     
+    stbi_set_flip_vertically_on_load(true);
+
+
     
 
     Shader shaderProgram3("shaders/shader.vert","shaders/shader.frag");
 
-    const char* imgPath = "assets/bricks.jpg";
+    
     // Texture popCat(imgPath, GL_TEXTURE_2D, GL_TEXTURE0, GL_UNSIGNED_BYTE);
 	// popCat.texUnit(shaderProgram3, "tex0", 0);
     // popCat.Bind();
+    
+    /*testing the image struct that's gonna be used as a data type that's shared b/n
+    the main thread and backgroung thread */
+    stbi_set_flip_vertically_on_load(true);
+    int width,height,numCloch;
+    bool success;
+    const char* imgPath = "assets/bricks.jpg";
+    unsigned char *bytes=stbi_load(imgPath,&width,&height,&numCloch,0);
+    if(bytes!=nullptr){
+        success=true;
+    }
+    else{
+        std::cout<<"failed to load texture";
+    }
 
-    Image brickWall(imgPath,GL_TEXTURE_2D,GL_TEXTURE0,GL_UNSIGNED_BYTE,glm::vec3(0.0f,0.0f,0.0f));
-
+    imageStruct image(bytes,width,height,success);
+    Image brickWall(image,GL_TEXTURE_2D,GL_TEXTURE0,GL_UNSIGNED_BYTE,glm::vec3(0.0f,0.0f,0.0f));
     glm::mat4 model=glm::mat4(1.0f);
     glm::mat4 view = glm::mat4(1.0f);
     glm::mat4 projection;
@@ -129,7 +145,19 @@ int main(){
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetCursorPosCallback(window, mouse_callback);
 
-    
+    /*testing the filesystem iterator*/
+    int32_t count=0;
+    for ( const auto& entry : std::filesystem::directory_iterator("assets") ){
+        if(entry.is_regular_file()){
+            auto ext=entry.path().extension();
+            if(ext ==".jpg"){
+                std::cout<<entry.path().generic_string()<<std::endl;
+                count++;
+
+            }
+        }
+    }
+    std::cout<<count<<std::endl;
     while(!glfwWindowShouldClose(window)){
 
         glClearColor(0.039f, 0.059f, 0.122f,0.3f);
@@ -140,7 +168,8 @@ int main(){
         brickWall.Draw(shaderProgram3,indices);
         view=camera.GetViewMatrix();
         shaderProgram3.setMat4(1,GL_FALSE,view);
-        glDrawElements(GL_TRIANGLES,sizeof(indices)/sizeof(int),GL_UNSIGNED_INT,0);
+        
+        brickWall.Draw(shaderProgram3,indices);
 
         glfwSwapBuffers(window);
 

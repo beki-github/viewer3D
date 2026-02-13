@@ -1,8 +1,8 @@
 
 #include "Image.h"
 
-Image::Image(const char* imagePath, GLenum texType, GLenum slot, GLenum pixelType,glm::vec3 position)
-:Texture(imagePath,texType,slot,pixelType),Position{position}
+Image::Image(imageStruct image, GLenum texType, GLenum slot, GLenum pixelType,glm::vec3 position)
+:Texture(image,texType,slot,pixelType),Position{position}
 { 
     /*set the initial value of model matrix
     to the vec3 Position defined on  */
@@ -30,6 +30,6 @@ void Image::Updatestate(Shader &shader)
   Bind();
   texUnit(shader,"tex0",0);
   model=glm::translate(glm::mat4(1.0f),Position);
-  model=glm::scale(model,glm::normalize(glm::vec3(widthImg,heightImg,1)));
+  model=glm::scale(model,glm::vec3(static_cast<float>(imagePhoto.width/imagePhoto.height),1.0f,1.0f));
   shader.setMat4(0,GL_FALSE,model);
 }
