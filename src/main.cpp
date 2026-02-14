@@ -1,6 +1,9 @@
 #include <iostream>
 #include <filesystem>
 #include <vector>
+#include <queue>
+#include <thread>
+#include <mutex>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -53,9 +56,47 @@ float pitch = 0.0f;
 Camera camera = Camera(cameraPos,cameraUp);
 // struct for image 
 
-
 std::vector<imageStruct> imageVector;
+std::queue<imageStruct> imageQueue;
+std::mutex queueMutex;
 
+/* defining a background thread functions that loads the assets as a byte and additional
+information such as image width,height and numcloch and constructs an image struct that has been
+defined in Texture.h and push it to the queue
+
+and a global variable 
+*/
+bool running = true;
+
+void loadThread(){
+    int32_t count=0;
+    for ( const auto& entry : std::filesystem::directory_iterator("assets") ){
+        if(entry.is_regular_file()){
+            auto ext=entry.path().extension();
+            if(ext ==".jpg"){
+                stbi_set_flip_vertically_on_load(true);
+                 int width,height,numCloch;
+                 bool success;
+                 const char* imgPath = entry.path().generic_string().c_str();
+                 unsigned char *bytes=stbi_load(imgPath,&width,&height,&numCloch,0);
+                if(bytes!=nullptr){success=true;
+                    {    
+                        
+                        std::lock_guard<std::mutex> lock(queueMutex);
+                        imageQueue.push(imageStruct(bytes,width,height,success));
+                    }
+                    
+                  
+                }
+                else{std::cout<<"failed to load texture"; }
+                std::cout<<entry.path().generic_string()<<std::endl;
+                count++;
+
+            }
+        }
+    }
+   running=false;
+}
 int main(){
     //intalize glfw 
     glfwInit();
@@ -98,34 +139,9 @@ int main(){
     VAO1.Unbind();
     VBO1.Unbind();
     
-    stbi_set_flip_vertically_on_load(true);
-
-
-    
 
     Shader shaderProgram3("shaders/shader.vert","shaders/shader.frag");
 
-    
-    // Texture popCat(imgPath, GL_TEXTURE_2D, GL_TEXTURE0, GL_UNSIGNED_BYTE);
-	// popCat.texUnit(shaderProgram3, "tex0", 0);
-    // popCat.Bind();
-    
-    /*testing the image struct that's gonna be used as a data type that's shared b/n
-    the main thread and backgroung thread */
-    stbi_set_flip_vertically_on_load(true);
-    int width,height,numCloch;
-    bool success;
-    const char* imgPath = "assets/bricks.jpg";
-    unsigned char *bytes=stbi_load(imgPath,&width,&height,&numCloch,0);
-    if(bytes!=nullptr){
-        success=true;
-    }
-    else{
-        std::cout<<"failed to load texture";
-    }
-
-    imageStruct image(bytes,width,height,success);
-    Image brickWall(image,GL_TEXTURE_2D,GL_TEXTURE0,GL_UNSIGNED_BYTE,glm::vec3(0.0f,0.0f,0.0f));
     glm::mat4 model=glm::mat4(1.0f);
     glm::mat4 view = glm::mat4(1.0f);
     glm::mat4 projection;
@@ -139,37 +155,45 @@ int main(){
     shaderProgram3.setMat4(2,GL_FALSE,projection);
     shaderProgram3.setMat4(0,GL_FALSE,model);
 
+
+    
     
     glEnable(GL_DEPTH_TEST);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    
 
     /*testing the filesystem iterator*/
-    int32_t count=0;
-    for ( const auto& entry : std::filesystem::directory_iterator("assets") ){
-        if(entry.is_regular_file()){
-            auto ext=entry.path().extension();
-            if(ext ==".jpg"){
-                std::cout<<entry.path().generic_string()<<std::endl;
-                count++;
-
-            }
-        }
-    }
-    std::cout<<count<<std::endl;
+ 
+   
+   
     while(!glfwWindowShouldClose(window)){
 
         glClearColor(0.039f, 0.059f, 0.122f,0.3f);
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
         processInput(window,glfwGetTime());
         VAO1.Bind();
-       
+
+
+        while (running||!imageQueue.empty())
+        {
+            if(!imageQueue.empty()){
+                std::lock_guard<std::mutex> lock(queueMutex);
+                imageVector.push_back(imageQueue.front());
+                imageQueue.pop();
+            }
+        }
+        
+        Image brickWall(imageVector[0],GL_TEXTURE_2D,GL_TEXTURE0,GL_UNSIGNED_BYTE,glm::vec3(0.0f,0.0f,0.0f));
+        Image power(imageVector[1],GL_TEXTURE_2D,GL_TEXTURE0,GL_UNSIGNED_BYTE,glm::vec3(2.0f,0.0f,0.0f));
+
         brickWall.Draw(shaderProgram3,indices);
         view=camera.GetViewMatrix();
         shaderProgram3.setMat4(1,GL_FALSE,view);
         
         brickWall.Draw(shaderProgram3,indices);
+        power.Draw(shaderProgram3,indices);
 
         glfwSwapBuffers(window);
 
@@ -182,7 +206,7 @@ int main(){
     VAO1.Delete();
     VBO1.Delete();
     EBO1.Delete();
-    brickWall.Delete();
+    
 
     //terminate glfw 
     glfwTerminate();
