@@ -30,6 +30,7 @@ void Image::Updatestate(Shader &shader)
   Bind();
   texUnit(shader,"tex0",0);
   model=glm::translate(glm::mat4(1.0f),Position);
-  model=glm::scale(model,glm::vec3(static_cast<float>(imagePhoto.width/imagePhoto.height),1.0f,1.0f));
+  float aspect = static_cast<float>(imagePhoto.width) / static_cast<float>(imagePhoto.height);
+  model = glm::scale(model, glm::vec3(aspect, 1.0f, 1.0f));
   shader.setMat4(0,GL_FALSE,model);
 }

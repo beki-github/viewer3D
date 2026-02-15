@@ -68,34 +68,24 @@ and a global variable
 */
 bool running = true;
 
-void loadThread(){
-    int32_t count=0;
-    for ( const auto& entry : std::filesystem::directory_iterator("assets") ){
-        if(entry.is_regular_file()){
-            auto ext=entry.path().extension();
-            if(ext ==".jpg"){
-                stbi_set_flip_vertically_on_load(true);
-                 int width,height,numCloch;
-                 bool success;
-                 const char* imgPath = entry.path().generic_string().c_str();
-                 unsigned char *bytes=stbi_load(imgPath,&width,&height,&numCloch,0);
-                if(bytes!=nullptr){success=true;
-                    {    
-                        
-                        std::lock_guard<std::mutex> lock(queueMutex);
-                        imageQueue.push(imageStruct(bytes,width,height,success));
-                    }
-                    
-                  
-                }
-                else{std::cout<<"failed to load texture"; }
-                std::cout<<entry.path().generic_string()<<std::endl;
-                count++;
-
+void loadThread() {
+    for (const auto& entry : std::filesystem::directory_iterator("assets")) {
+        if (entry.is_regular_file() && entry.path().extension() == ".jpg") {
+            int width, height, numCloch;
+            std::string path = entry.path().generic_string();
+            stbi_set_flip_vertically_on_load(true);
+            unsigned char* bytes = stbi_load(path.c_str(), &width, &height, &numCloch, 0);
+            
+            if (bytes) {
+                std::lock_guard<std::mutex> lock(queueMutex);
+                // Pass numCloch so the Texture class knows the format
+                imageQueue.push(imageStruct(bytes, width, height, numCloch, true));
+            } else {
+                std::cout << "STB failed to load: " << path << std::endl;
             }
         }
     }
-   running=false;
+    running = false;
 }
 int main(){
     //intalize glfw 
@@ -165,8 +155,9 @@ int main(){
     
 
     /*testing the filesystem iterator*/
+    std::vector<Image> gallery;
  
-   
+   std::thread worker(loadThread);
    
     while(!glfwWindowShouldClose(window)){
 
@@ -175,25 +166,34 @@ int main(){
         processInput(window,glfwGetTime());
         VAO1.Bind();
 
+    view = camera.GetViewMatrix(); 
+    
+    // 2. Send it to the shader (Assuming Location 1 is your View Matrix)
+    shaderProgram3.use();
+    shaderProgram3.setMat4(1, GL_FALSE, view);
 
-        while (running||!imageQueue.empty())
-        {
-            if(!imageQueue.empty()){
-                std::lock_guard<std::mutex> lock(queueMutex);
-                imageVector.push_back(imageQueue.front());
-                imageQueue.pop();
-            }
-        }
         
-        Image brickWall(imageVector[0],GL_TEXTURE_2D,GL_TEXTURE0,GL_UNSIGNED_BYTE,glm::vec3(0.0f,0.0f,0.0f));
-        Image power(imageVector[1],GL_TEXTURE_2D,GL_TEXTURE0,GL_UNSIGNED_BYTE,glm::vec3(2.0f,0.0f,0.0f));
 
-        brickWall.Draw(shaderProgram3,indices);
-        view=camera.GetViewMatrix();
-        shaderProgram3.setMat4(1,GL_FALSE,view);
+      {
+    std::lock_guard<std::mutex> lock(queueMutex);
+    while (!imageQueue.empty()) {
+        imageStruct data = imageQueue.front();
+        imageQueue.pop();
+
+        float xOffset = gallery.size() * 3.0f; 
         
-        brickWall.Draw(shaderProgram3,indices);
-        power.Draw(shaderProgram3,indices);
+        gallery.emplace_back(data, GL_TEXTURE_2D, GL_TEXTURE0, GL_UNSIGNED_BYTE, glm::vec3(xOffset, 0.0f, 0.0f));
+        std::cout << "Image " << gallery.size() << " ready on GPU." << std::endl;
+    }
+}
+
+// Render the entire gallery
+    for (Image& img : gallery) {
+    img.Draw(shaderProgram3, indices);
+    }
+
+
+        
 
         glfwSwapBuffers(window);
 
@@ -212,6 +212,7 @@ int main(){
     glfwTerminate();
     glfwDestroyWindow(window);
 
+    if(worker.joinable()) worker.join();
     return 0;
 }
 void processInput(GLFWwindow* window, float currentTime) {

@@ -9,7 +9,7 @@ struct imageStruct{
     unsigned char *bytes;
     int width,height,numCloch;
     bool success;
-    imageStruct(unsigned char *imgbytes, int imgWidth, int imgheight, bool loadstatus)
+    imageStruct(unsigned char *imgbytes, int imgWidth, int imgheight,int numCloch ,bool loadstatus)
     :bytes(imgbytes),width(imgWidth),height(imgheight),success(loadstatus)
     {
 
