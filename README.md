@@ -39,10 +39,10 @@ Bash
 git clone https://github.com/YOUR_USERNAME/viewer3D.git
 cd viewer3D
 * **3. Build via VS Code**
-Select Kit: Press Ctrl + Shift + P and run CMake: Select a Kit. Select your GCC compiler.
+* **Select Kit: Press Ctrl + Shift + P and run CMake: Select a Kit. Select your GCC compiler.**
 
-Select Variant: Press Ctrl + Shift + P and run CMake: Select Variant. Choose Release.
+* **Select Variant: Press Ctrl + Shift + P and run CMake: Select Variant. Choose Release.**
 
-Reconfigure: Press Ctrl + Shift + P and run CMake: Delete Cache and Reconfigure.
+* **Reconfigure: Press Ctrl + Shift + P and run CMake: Delete Cache and Reconfigure.**
 
-Compile: Press F7 or click Build in the status bar to generate the executable.
+* **Compile: Press F7 or click Build in the status bar to generate the executable.**
