@@ -1,10 +1,10 @@
-##Viewer3D for Windows
+## Viewer3D for Windows
 An OpenGL-powered 3D image viewer featuring asynchronous asset loading and dynamic GPU texture promotion. This project serves as an exploration of real-time graphics rendering and multi-threaded resource management in C++.
 
-##🚀 Overview
+## 🚀 Overview
 Viewer3D provides an immersive environment for navigating image libraries in a 3D space. By implementing a Producer-Consumer multithreading model, the system separates heavy disk I/O from the rendering pipeline, allowing the user to move freely while high-resolution textures are loaded and "promoted" to the GPU in the background.
 
-##🛠️ Tech Stack
+## 🛠️ Tech Stack
 * **Language: C++ (Modern Standards)**
 
 * **Graphics API: OpenGL 4.3 (Core Profile)**
@@ -17,7 +17,7 @@ Viewer3D provides an immersive environment for navigating image libraries in a 3
 
 * **Mathematics: GLM (OpenGL Mathematics)**
 
-##🧩 Core Architecture
+## 🧩 Core Architecture
 * **Asynchronous Loader: A dedicated background thread that handles directory iteration and stbi loading to prevent main-thread "hitching."**
 
 * **GPU Promotion Queue: A thread-safe std::queue using std::mutex to manage the transfer of image data from CPU RAM to GPU VRAM.**
@@ -26,7 +26,7 @@ Viewer3D provides an immersive environment for navigating image libraries in a 3
 
 * **FPS Camera: A 6-DOF Euler-angle camera system for intuitive navigation using WASD and mouse-look.**
 
-##⚙️ Initial Setup
+## ⚙️ Initial Setup
 * **1. Prerequisite Configuration**
 Ensure your local machine is configured with the necessary GCC compilers and graphics headers by following the steps in readGLsetup.md.
 
