@@ -40,7 +40,7 @@ Ensure your local machine is configured with the necessary GCC compilers and gra
 
 * **2. Clone the Repository**
 Bash
-git clone https://github.com/YOUR_USERNAME/viewer3D.git
+git clone https://github.com/beki-github/viewer3D/tree/main
 cd viewer3D
 * **3. Build via VS Code**
 * **Select Kit: Press Ctrl + Shift + P and run CMake: Select a Kit. Select your GCC compiler.**
