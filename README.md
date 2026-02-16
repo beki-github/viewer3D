@@ -1,7 +1,11 @@
-## Viewer3D for Windows
+# Viewer3D for Windows
+
+
 An OpenGL-powered 3D image viewer featuring asynchronous asset loading and dynamic GPU texture promotion. This project serves as an exploration of real-time graphics rendering and multi-threaded resource management in C++.
 
 ## 🚀 Overview
+
+
 Viewer3D provides an immersive environment for navigating image libraries in a 3D space. By implementing a Producer-Consumer multithreading model, the system separates heavy disk I/O from the rendering pipeline, allowing the user to move freely while high-resolution textures are loaded and "promoted" to the GPU in the background.
 
 ## 🛠️ Tech Stack
