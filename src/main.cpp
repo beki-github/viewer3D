@@ -60,6 +60,11 @@ std::vector<imageStruct> imageVector;
 std::queue<imageStruct> imageQueue;
 std::mutex queueMutex;
 
+ /*testing the filesystem iterator*/
+ std::vector<Image> gallery;
+ GLfloat currentIndex=0.0f;
+
+
 /* defining a background thread functions that loads the assets as a byte and additional
 information such as image width,height and numcloch and constructs an image struct that has been
 defined in Texture.h and push it to the queue
@@ -154,8 +159,7 @@ int main(){
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     
 
-    /*testing the filesystem iterator*/
-    std::vector<Image> gallery;
+   
  
    std::thread worker(loadThread);
    
@@ -189,7 +193,8 @@ int main(){
 
 // Render the entire gallery
     for (Image& img : gallery) {
-    img.Draw(shaderProgram3, indices);
+    img.Draw(shaderProgram3,currentIndex);
+
     }
 
 
@@ -231,6 +236,12 @@ void processInput(GLFWwindow* window, float currentTime) {
         camera.ProcessKeyboard(RIGHT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         camera.ProcessKeyboard(LEFT, deltaTime);
+
+    //for parsing through the gallary images 
+    if(glfwGetKey(window,GLFW_KEY_RIGHT))
+        currentIndex-=7.0f*deltaTime;
+    if(glfwGetKey(window,GLFW_KEY_LEFT))
+        currentIndex+=7.0f*deltaTime;
 }
 void mouse_callback(GLFWwindow* window, double xPos, double yPos)
 {

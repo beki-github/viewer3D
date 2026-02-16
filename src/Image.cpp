@@ -10,10 +10,10 @@ Image::Image(imageStruct image, GLenum texType, GLenum slot, GLenum pixelType,gl
     
 
 }
-void Image::Draw(Shader &shader,GLuint indicies[])
+void Image::Draw(Shader &shader,GLfloat index)
 {    
   
-    Updatestate(shader);
+    Updatestate(shader,index);
     glDrawElements(GL_TRIANGLES,6,GL_UNSIGNED_INT,0);
    
 }
@@ -21,15 +21,14 @@ void Image::Draw(Shader &shader,GLuint indicies[])
 void Image::Moveto(glm::vec3 newPosition)
 {
   Position=newPosition;
- 
 }
 
-void Image::Updatestate(Shader &shader)
+void Image::Updatestate(Shader &shader,GLfloat index)
 {
   shader.use();
   Bind();
   texUnit(shader,"tex0",0);
-  model=glm::translate(glm::mat4(1.0f),Position);
+  model=glm::translate(glm::mat4(1.0f),glm::vec3(Position.x+index,Position.y,Position.z));
   float aspect = static_cast<float>(imagePhoto.width) / static_cast<float>(imagePhoto.height);
   model = glm::scale(model, glm::vec3(aspect, 1.0f, 1.0f));
   shader.setMat4(0,GL_FALSE,model);
